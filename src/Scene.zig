@@ -29,9 +29,13 @@ pub fn load(reader: anytype, allocator: std.mem.Allocator) !Self {
     var faces = std.ArrayList(Face).init(allocator);
     errdefer faces.deinit();
 
+    var last = false;
     while (true) {
         reader.readUntilDelimiterArrayList(&line_buffer, '\n', std.math.maxInt(usize)) catch |err| switch (err) {
-            error.EndOfStream => break,
+            error.EndOfStream => {
+                if(last) break;
+                last = true;
+            },
             else => |e| return e,
         };
 
